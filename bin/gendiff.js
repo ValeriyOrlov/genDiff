@@ -1,7 +1,7 @@
 #!/usr/bin/env node
-import { program } from "commander";
-import getFile from '../src/getFile.js'
-import genDiff from "../src/genDiff.js";
+import { program } from 'commander';
+import getFile from '../src/getFile.js';
+import genDiff from '../src/genDiff.js';
 
 program
   .name('gendiff')
@@ -14,5 +14,5 @@ program
     const file1 = getFile(filepath1);
     const file2 = getFile(filepath2);
     console.log(genDiff(file1, file2));
-  })
+  });
 program.parse();
