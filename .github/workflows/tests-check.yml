@@ -1,0 +1,11 @@
+name: tests-check
+on: push
+
+jobs: 
+  tests-check:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+      - run: npm install --save-dev jest
+      - run: make test
