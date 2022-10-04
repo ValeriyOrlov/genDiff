@@ -1,4 +1,4 @@
-name: Node CI
+name: NodeCI
 
 on:
   - push
@@ -9,7 +9,7 @@ jobs:
 
     strategy:
       matrix:
-        node-version: [19.x]
+        node-version: [16.x]
 
     steps:
       - uses: actions/checkout@v3
