@@ -1,5 +1,8 @@
-install-deps:
+install:
 	npm ci
+
+publish:
+	npm publish --dry-run
 
 lint:
 	npx eslint .
@@ -7,5 +10,5 @@ lint:
 test:
 	NODE_OPTIONS=--experimental-vm-modules npx jest .
 
-publish:
-	npm publish
+test-coverage:
+	npm test -- --coverage --coverageProvider=v8
