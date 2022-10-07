@@ -1,6 +1,6 @@
 import path, { dirname } from 'node:path';
 import { fileURLToPath } from 'url';
-import getFile from '../src/getFile.js';
+import parse from '../src/parsers.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -15,8 +15,8 @@ const expAfterFlatComp = {
   '  host': 'hexlet.io',
 };
 
-const file1 = getFile(getFixturePath('file1.json'));
-const file2 = getFile(getFixturePath('file2.json'));
+const file1 = parse(getFixturePath('file1.json'));
+const file2 = parse(getFixturePath('file2.json'));
 
 test('flat comparison testing', () => {
   expect(expAfterFlatComp['- timeout']).toEqual(file1.timeout);
