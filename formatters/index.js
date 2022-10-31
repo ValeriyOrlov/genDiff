@@ -1,15 +1,16 @@
-import { stylish } from "./stylish.js"
-import { plain  } from "./plain.js";
+import stylish from './stylish.js';
+import plain from './plain.js';
+import json from './json.js';
 
 export default (file, formatName) => {
-    switch (formatName) {
-        case 'stylish':
-            console.log(stylish(file));
-            break;
-        case 'plain':
-            console.log(plain(file));
-            break;
-        default:
-            console.log('Format not supported')
-    }
-}
+  switch (formatName) {
+    case 'stylish':
+      return console.log(stylish(file));
+    case 'plain':
+      return console.log(plain(file));
+    case 'json':
+      return console.log(json(file));
+    default:
+      return console.log('Format not supported');
+  }
+};
