@@ -5,7 +5,7 @@ const builder = (file1, file2) => {
   const file2Keys = Object.keys(file2);
   const diff = _.sortBy(_.union(file1Keys, file2Keys))
     .map((key) => {
-      if (_.isObject(file2[key])) {
+      if (_.isObject(file1[key]) && _.isObject(file2[key])) {
         if (Object.hasOwn(file1, key) && Object.hasOwn(file2, key)) {
           return { name: key, status: ' ', value: builder(file1[key], file2[key]) };
         }
