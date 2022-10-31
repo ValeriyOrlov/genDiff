@@ -1,40 +1,38 @@
 import _ from 'lodash';
 
-const file3 = [{ name: 'common', status: '~', value: [{name: '', status: '', value: [{ name: 'setting3', status: '-', value: true }, { name: 'setting3', status: '+', value: null }] },
-{ name: 'setting4', status: '+', value: 'blah blah' },
-{ name: 'setting5', status: '+', value: { key5: 'value5' } }]}];
+const isFile = (val) => !_.isObject(val);
+const isArray = (val) => Array.isArray(val);
+const addQuotes = (val) => (_.isBoolean(val) || val === null ? `${val}` : `'${val}'`);
+const changedValues = (changedValue) => changedValue.map(({ value }) => (_.isObject(value) ? '[complex value]' : addQuotes(value))).join(' to ');
 
-const expected = [{
-  name: 'common',
-  status: '~',
-  value: [
-    { name: 'follow', status: '+', value: false },
-    { name: 'setting1', status: '~', value: 'Value1' },
-    { name: 'setting2', status: '-', value: 200 },
-    { name: 'setting3', status: 'changed', value: [{ name: 'setting3', status: '-', value: true }, { name: 'setting3', status: '+', value: null }] },
-    { name: 'setting4', status: '+', value: 'blah blah' },
-    { name: 'setting5', status: '+', value: { key5: 'value5' } },
-    {
-      name: 'setting6',
-      status: '~',
-      value: [
-        { name: 'doge', status: '~', value: [{ name: 'wow', status: 'changed', value: [{ name: 'wow', status: '-', value: '' }, { name: 'wow', status: '+', value: 'so much' }] }] },
-        { name: 'key', status: '~', value: 'value' }, { name: 'ops', status: '+', value: 'vops' }],
-    }],
-}];
-
-export const plain = (tree) => {
-  /*const isFile = (val) => !_.isObject(val);
-  const isArray = (val) => Array.isArray(val);
-  if (isArray(tree)) {
-      return tree.map(({ status, name, value }) => {
-          if (isFile(value)) {
-              return `${status} ${name}: ${value}\n`;
-          }
-          return status === 'changed' ? monkey(value) : `${status} ${name}:\n${monkey(value)}`
-      }).join('')
+const switcher = (path, name, status, value) => {
+  const basicOrComplexValue = _.isObject(value) ? '[complex value]' : `${value}`;
+  switch (status) {
+    case '+':
+      return `Property '${path}${name}' was added with value: ${basicOrComplexValue}`;
+    case '-':
+      return `Property '${path}${name}' was removed`;
+    case 'changed':
+      return `Property '${path}${name}' was updated. From ${basicOrComplexValue}`;
+    default:
+      return 'do not print';
   }
-  const entries = Object.entries(tree);
-  return entries.map(([name, value]) => isFile(value) ? `${name}: ${value}\n` : `${name}:\n${monkey(value)}`).join('')*/
-  console.log('COMING SOON')
 };
+
+const plain = (tree, path = '') => {
+  if (isArray(tree)) {
+    return tree.map(({ status, name, value }) => {
+      if (isFile(value)) {
+        return `${switcher(path, name, status, addQuotes(value))}\n`;
+      }
+      if (status === 'changed') {
+        return `${switcher(path, name, status, changedValues(value))}\n`;
+      }
+      return isArray(value) ? plain(value, `${path}${name}.`) : `${switcher(path, name, status, value)}\n`;
+    })
+      .filter((value) => value !== 'do not print\n')
+      .join('');
+  }
+  return '';
+};
+export default plain;
