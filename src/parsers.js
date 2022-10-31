@@ -1,11 +1,11 @@
 import yaml from 'js-yaml';
 
 export default (file, format) => {
-  let parse;
   if (format === '.json') {
-    parse = JSON.parse(file);
-  } else if (format === '.yml' || format === 'yaml') {
-    parse = yaml.load(file);
+    return JSON.parse(file);
   }
-  return parse;
+  if (format === '.yml' || format === 'yaml') {
+    return yaml.load(file);
+  }
+  return 'format not supported';
 };
