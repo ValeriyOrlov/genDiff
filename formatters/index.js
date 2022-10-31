@@ -5,11 +5,11 @@ import json from './json.js';
 export default (file, formatName) => {
   switch (formatName) {
     case 'stylish':
-      return console.log(stylish(file));
+      return stylish(file);
     case 'plain':
-      return console.log(plain(file));
+      return plain(file);
     case 'json':
-      return console.log(json(file));
+      return json(file);
     default:
       return console.log('Format not supported');
   }
