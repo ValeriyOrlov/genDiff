@@ -2,7 +2,7 @@ import _ from 'lodash';
 
 const isFile = (val) => !_.isObject(val);
 const isArray = (val) => Array.isArray(val);
-const addQuotes = (val) => (_.isBoolean(val) || val === null ? `${val}` : `'${val}'`);
+const addQuotes = (val) => (typeof val !== 'string' ? `${val}` : `'${val}'`);
 const changedValues = (changedValue) => changedValue.map(({ value }) => (_.isObject(value) ? '[complex value]' : addQuotes(value))).join(' to ');
 
 const switcher = (path, name, status, value) => {
