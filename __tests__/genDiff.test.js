@@ -1,33 +1,33 @@
 import path, { dirname } from 'node:path';
 import { fileURLToPath } from 'url';
-import { genDiff } from '../src/genDiff.js';
+import readFileAndFormat from '../src/readFileAndFormat.js';
+import builder from '../src/builder.js';
+import stylish from '../formatters/stylish.js';
+import plain from '../formatters/plain.js';
 import parse from '../src/parsers.js';
+import json from '../formatters/json.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 const getFixturePath = (filename) => path.join(__dirname, '..', '__fixtures__', filename);
 
-const file1 = parse(getFixturePath('deepJson1.json'));
-const file2 = parse(getFixturePath('deepJson2.json'));
-const file3 = [{ name: 'common', status: '~', value: [{ value: [{ name: 'setting3', status: '-', value: true }, { name: 'setting3', status: '+', value: null }] },
-{ name: 'setting4', status: '+', value: 'blah blah' },
-{ name: 'setting5', status: '+', value: { key5: 'value5' } }]}];
+const [data1, format1] = readFileAndFormat(getFixturePath('deepJson1.json'));
+const [data2, format2] = readFileAndFormat(getFixturePath('deepYml2.yml'));
+const file1 = parse(data1, format1);
+const file2 = parse(data2, format2);
 
-test('test 1', () => {
-  const actual = genDiff({}, {});
+test('parser fail', () => {
+  const actual = parse(file1, '.random');
+  expect(actual).toEqual('format not supported');
+});
+
+test('builder test 1: to be empty', () => {
+  const actual = builder({}, {});
   expect(actual).toEqual([]);
 });
 
-test('test 2', () => {
-  const actual = genDiff({ firstName: 'Valeriy', secondName: 'Orlov', profession: 'PelmensKiller' }, { firstName: 'Valeriy', secondName: 'Pelmenev' });
-  const expected = [{ name: 'firstName', value: 'Valeriy', status: '~' },
-    { name: 'profession', status: '-', value: 'PelmensKiller' },
-    { name: 'secondName', status: 'changed', value: [{ name: 'secondName', status: '-', value: 'Orlov' }, { name: 'secondName', status: '+', value: 'Pelmenev' }] }];
-  expect(actual).toEqual(expected);
-});
-
-test('test 3', () => {
-  const actual = genDiff(
+test('builder full test', () => {
+  const actual = builder(
     {
       common: {
         setting1: 'Value1', setting2: 200, setting3: true, setting6: { key: 'value', doge: { wow: '' } },
@@ -41,69 +41,54 @@ test('test 3', () => {
   );
   const expected = [{
     name: 'common',
-    status: '~',
+    status: ' ',
     value: [
       { name: 'follow', status: '+', value: false },
-      { name: 'setting1', status: '~', value: 'Value1' },
+      { name: 'setting1', status: ' ', value: 'Value1' },
       { name: 'setting2', status: '-', value: 200 },
       { name: 'setting3', status: 'changed', value: [{ name: 'setting3', status: '-', value: true }, { name: 'setting3', status: '+', value: null }] },
       { name: 'setting4', status: '+', value: 'blah blah' },
       { name: 'setting5', status: '+', value: { key5: 'value5' } },
       {
         name: 'setting6',
-        status: '~',
+        status: ' ',
         value: [
-          { name: 'doge', status: '~', value: [{ name: 'wow', status: 'changed', value: [{ name: 'wow', status: '-', value: '' }, { name: 'wow', status: '+', value: 'so much' }] }] },
-          { name: 'key', status: '~', value: 'value' }, { name: 'ops', status: '+', value: 'vops' }],
+          { name: 'doge', status: ' ', value: [{ name: 'wow', status: 'changed', value: [{ name: 'wow', status: '-', value: '' }, { name: 'wow', status: '+', value: 'so much' }] }] },
+          { name: 'key', status: ' ', value: 'value' }, { name: 'ops', status: '+', value: 'vops' }],
       }],
   }];
   expect(actual).toEqual(expected);
 });
-/*
-test('test5', () => {
-  const actual = plain(file3);
-  const expected = "Property 'common.setting3' was updated. From true to null\nProperty 'common.setting4' was added with value: 'blah blah'\nProperty 'common.setting5' was added with value: [complex value]";
+
+test('stylish test', () => {
+  const actual = stylish(builder(file1, file2));
+  const expected = [
+    ['{\n    common: {\n      + follow: false\n        setting1: Value 1\n      - setting2: 200\n      - setting3: true\n      + setting3: null\n      + setting4: blah blah\n      + setting5: {\n            key5: value5\n        }\n        setting6: {\n            doge: {\n              - wow: \n              + wow: so much\n            }\n            key: value\n          + ops: vops\n        }\n    }\n    group1: {\n      - baz: bas\n      + baz: bars\n        foo: bar\n      - nest: {\n            key: value\n        }\n      + nest: str\n    }\n  - group2: {\n        abc: 12345\n        deep: {\n            id: 45\n        }\n    }\n  + group3: {\n        deep: {\n            id: {\n                number: 45\n            }\n        }\n        fee: 100500\n    }\n}',
+    ]].join(' ');
   expect(actual).toEqual(expected);
 });
 
-
-  it('test 2', () => {
-    const actual = genDiff({ one: 'eon' }, { two: 'own' });
-    const expected = {
-      one: 'deleted',
-      two: 'added',
-    };
-    expect(actual).toEqual(expected);
-  });
-
-  it('test 3', () => {
-    const actual = genDiff({ one: 'eon', two: 'two' }, { two: 'own', one: 'one' });
-    const expected = {
-      one: 'changed',
-      two: 'changed',
-    };
-    expect(actual).toEqual(expected);
-  });
-
-  it('test 4', () => {
-    const actual = genDiff({}, { two: 'own' });
-    const expected = {
-      two: 'added',
-    };
-    expect(actual).toEqual(expected);
-  });
-
-  it('test 5', () => {
-    const actual = genDiff({ one: 'eon' }, {});
-    const expected = {
-      one: 'deleted',
-    };
-    expect(actual).toEqual(expected);
-  });
-
-  it('test 6', () => {
-    const actual = genDiff({ unchanged: 'item' }, { unchanged: 'item' });
-    expect(actual).toEqual({ unchanged: 'unchanged' });
-  });
+test('plain test', () => {
+  const actual = plain(builder(file1, file2));
+  const expected = [
+    ['Property \'common.follow\' was added with value: false\n'],
+    ['Property \'common.setting2\' was removed\n'],
+    ['Property \'common.setting3\' was updated. From true to null\n'],
+    ['Property \'common.setting4\' was added with value: \'blah blah\'\n'],
+    ['Property \'common.setting5\' was added with value: [complex value]\n'],
+    ['Property \'common.setting6.doge.wow\' was updated. From \'\' to \'so much\'\n'],
+    ['Property \'common.setting6.ops\' was added with value: \'vops\'\n'],
+    ['Property \'group1.baz\' was updated. From \'bas\' to \'bars\'\n'],
+    ['Property \'group1.nest\' was updated. From [complex value] to \'str\'\n'],
+    ['Property \'group2\' was removed\n'],
+    ['Property \'group3\' was added with value: [complex value]\n'],
+  ].join('');
+  expect(actual).toEqual(expected);
 });
-*/
+
+test('json test', () => {
+  const actual = json(builder(file1, file2));
+  const expected = [
+    ['{\\n    \\"  common\\": {\\n    \\"+ follow\\": \\"false\\"\\n    \\"  setting1\\": \\"Value 1\\"\\n    \\"- setting2\\": \\"200\\"\\n    \\"- setting3\\": \\"true\\"\\n    \\"+ setting3\\": \\"null\\"\\n    \\"+ setting4\\": \\"blah blah\\"\\n    \\"+ setting5\\": {\\n    \\"key5: value5\\"\\n}\\n    \\"  setting6\\": {\\n    \\"  doge\\": {\\n    \\"- wow\\": \\"\\"\\n    \\"+ wow\\": \\"so much\\"\\n}\\n    \\"  key\\": \\"value\\"\\n    \\"+ ops\\": \\"vops\\"\\n}\\n}\\n    \\"  group1\\": {\\n    \\"- baz\\": \\"bas\\"\\n    \\"+ baz\\": \\"bars\\"\\n    \\"  foo\\": \\"bar\\"\\n    \\"- nest\\": {\\n    \\"key: value\\"\\n}\\n    \\"+ nest\\": \\"str\\"\\n}\\n    \\"- group2\\": {\\n    \\"abc: 12345\\"\\n    \\"deep: {\\n    \\"id: 45\\"\\n    }\\n}\\n    \\"+ group3\\": {\\n    \\"deep: {\\n    \\"id: {\\n    \\"number: 45\\"\\n    }\\n    }\\n    \\"fee: 100500\\"\\n}\\n}']].join(' ');
+  expect(actual).toEqual(expected);
+});
