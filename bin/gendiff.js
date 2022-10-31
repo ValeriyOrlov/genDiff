@@ -16,7 +16,8 @@ program
     const [data2, format2] = readFileAndFormat(filepath2);
     const file1 = parse(data1, format1);
     const file2 = parse(data2, format2);
-    const formatName = program.opts().format;
-    genDiff(file1, file2, formatName);
-  });
-program.parse();
+    genDiff(file1, file2, program.opts().format);
+  })
+  .parse();
+
+export default program;
