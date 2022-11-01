@@ -32,7 +32,7 @@ make install
 sudo npm link
 ```
 Program help output:
-``sh
+```sh
 gendiff -h
 
 Usage: gendiff [options] <filepath1> <filepath2>
@@ -43,7 +43,7 @@ Options:
   -V, --version        output the version number
   -f, --format <type>  output type (default: "stylish")
   -h, --help           display help for command
-``
+```
 
 ### Package setup and usage:
 ```sh
