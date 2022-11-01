@@ -27,35 +27,27 @@ There are two use cases:
 ### Program setup and usage:
 ```sh
 git@github.com:ValeriyOrlov/frontend-project-lvl2.git
-cd frontend-project-lvl2
+
 make install
 sudo npm link
 ```
 Program help output:
-```sh
+``sh
 gendiff -h
-```
 
-Output default(stylish) format:
-```sh
-gendiff file1.json file2.json
-```
+Usage: gendiff [options] <filepath1> <filepath2>
 
-Output other formats:
-```sh
-gendiff file1.json file2.json -f plain
-```
-or
+Compares two configuration files and shows a difference
 
-```sh
-gendiff file1.json file2.json -f json
-```
+Options:
+  -V, --version        output the version number
+  -f, --format <type>  output type (default: "stylish")
+  -h, --help           display help for command
+``
 
 ### Package setup and usage:
 ```sh
-npm install Femalopper/frontend-project-46
-```
+npm install <package path>
 
-```sh
 import genDiff from '@hexlet/code';
 ```
