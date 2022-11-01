@@ -20,7 +20,7 @@ const switcher = (path, name, status, value) => {
 };
 
 const plain = (tree, path = '') => {
-  if (isArray(tree)) {
+ if (isArray(tree)) {
     return tree.map(({ status, name, value }) => {
       if (isFile(value)) {
         return `${switcher(path, name, status, addQuotes(value))}\n`;
@@ -35,4 +35,4 @@ const plain = (tree, path = '') => {
   }
   return '';
 };
-export default plain;
+export default (file) => plain(file).trim();
