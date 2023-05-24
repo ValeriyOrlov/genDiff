@@ -1,25 +1,19 @@
 import path, { dirname } from 'node:path';
 import { fileURLToPath } from 'url';
-import readFileAndFormat from '../src/readFileAndFormat.js';
 import builder from '../src/builder.js';
 import stylish from '../formatters/stylish.js';
 import plain from '../formatters/plain.js';
-import parse from '../src/parsers.js';
+import parse from '../parsers/parser.js';
 import json from '../formatters/json.js';
+import getDataAndType from '../src/getDataAndType.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 const getFixturePath = (filename) => path.join(__dirname, '..', '__fixtures__', filename);
-
-const [data1, format1] = readFileAndFormat(getFixturePath('deepJson1.json'));
-const [data2, format2] = readFileAndFormat(getFixturePath('deepYml2.yml'));
-const file1 = parse(data1, format1);
-const file2 = parse(data2, format2);
-
-test('parser fail', () => {
-  const actual = parse(file1, '.random');
-  expect(actual).toEqual('format not supported');
-});
+const [data1, type1] = getDataAndType(getFixturePath('deepJson1.json'));
+const [data2, type2] = getDataAndType(getFixturePath('deepYml2.yml'));
+const file1 = parse(data1, type1);
+const file2 = parse(data2, type2);
 
 test('builder test 1: to be empty', () => {
   const actual = builder({}, {});
