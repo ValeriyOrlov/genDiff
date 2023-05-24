@@ -2,15 +2,18 @@ import stylish from './stylish.js';
 import plain from './plain.js';
 import json from './json.js';
 
-export default (file, formatName) => {
-  switch (formatName) {
-    case 'stylish':
-      return stylish(file);
-    case 'plain':
-      return plain(file);
-    case 'json':
-      return json(file);
-    default:
-      return console.log('Format not supported');
+const mapping = {
+  stylish: (data) => stylish(data),
+  plain: (data) => plain(data),
+  json: (data) => json(data),
+};
+
+export default (data, formatName) => {
+  try {
+    const format = mapping[formatName];
+    const formattedData = format(data);
+    return formattedData;
+  } catch (e) {
+    throw new Error('unknown format');
   }
 };

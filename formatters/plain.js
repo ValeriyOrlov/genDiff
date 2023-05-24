@@ -35,4 +35,4 @@ const plain = (tree, path = '') => {
   }
   return '';
 };
-export default (file) => plain(file).trim();
+export default (data) => plain(data).trim();
