@@ -14,6 +14,6 @@ export default (data, formatName) => {
     const formattedData = format(data);
     return formattedData;
   } catch (e) {
-    throw new Error('unknown format');
+    throw new Error('unexpected format of file');
   }
 };
