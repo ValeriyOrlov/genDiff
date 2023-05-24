@@ -3,7 +3,7 @@ import builder from './builder.js';
 import getDataAndType from './getDataAndType.js';
 import parser from '../parsers/parser.js';
 
-const genDiff = (path1, path2, format = 'stylish') => {
+export default (path1, path2, format = 'stylish') => {
   const [rawData1, type1] = getDataAndType(path1);
   const [rawData2, type2] = getDataAndType(path2);
   const data1 = parser(rawData1, type1);
@@ -12,5 +12,3 @@ const genDiff = (path1, path2, format = 'stylish') => {
   const formattedDiff = formatConfig(diff, format);
   return formattedDiff;
 };
-
-export default genDiff;
