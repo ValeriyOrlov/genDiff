@@ -1,15 +1,16 @@
-import formatSelector from '../formatters/index.js';
+import formatConfig from '../formatters/index.js';
 import builder from './builder.js';
-import readFileAndFormat from './readFileAndFormat.js';
-import parse from './parsers.js';
+import getDataAndType from './getDataAndType.js';
+import parser from '../parsers/parser.js';
 
-const genDiff = (filepath1, filepath2, formatName = 'stylish') => {
-  const [data1, format1] = readFileAndFormat(filepath1);
-  const [data2, format2] = readFileAndFormat(filepath2);
-  const file1 = parse(data1, format1);
-  const file2 = parse(data2, format2);
-
-  return formatSelector(builder(file1, file2), formatName);
+const genDiff = (path1, path2, format = 'stylish') => {
+  const [rawData1, type1] = getDataAndType(path1);
+  const [rawData2, type2] = getDataAndType(path2);
+  const data1 = parser(rawData1, type1);
+  const data2 = parser(rawData2, type2);
+  const diff = builder(data1, data2);
+  const formattedDiff = formatConfig(diff, format);
+  return formattedDiff;
 };
 
 export default genDiff;
